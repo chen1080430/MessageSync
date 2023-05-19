@@ -18,8 +18,8 @@
         tools:layout="@layout/fragment_message" />
 
     <fragment
-        android:id="@+id/navigation_about"
-        android:name="com.mason.messagesync.ui.about.AboutFragment"
+        android:id="@+id/navigation_about_offline"
+        android:name="com.mason.messagesync.ui.about.AboutOfflineFragment"
         android:label="@string/title_about"
-        tools:layout="@layout/fragment_about" />
+        tools:layout="@layout/fragment_about_offline" />
 </navigation>

@@ -36,7 +36,9 @@ class AboutFragment : Fragment() {
         }
 
         webView = binding.webView
-        webView.loadUrl("https://github.com/chen1080430/gitbook/blob/master/privacy-notice.md");
+
+//        webView.loadUrl("https://github.com/chen1080430/gitbook/blob/master/privacy-notice.md")
+        webView.loadUrl("https://masons-organization-1.gitbook.io/untitled/privacy-notice")
         webView.settings.javaScriptEnabled = false
         webView.settings.builtInZoomControls = true
         return root

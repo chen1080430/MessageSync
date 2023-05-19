@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "272546719747",
+    "project_id": "messagesync-a2c59",
+    "storage_bucket": "messagesync-a2c59.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272546719747:android:52bbc28ab71fff5b6dc636",
+        "android_client_info": {
+          "package_name": "com.mason.messagesync"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "272546719747-eei96f9f65npvm61614jilvn3ajafq5o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVNfakClgMGWym_GcyCyo5mQzAhq4Vjpw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "272546719747-eei96f9f65npvm61614jilvn3ajafq5o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

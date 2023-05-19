@@ -1,17 +1,23 @@
 package com.mason.messagesync
 
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.mason.messagesync.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-
+    private val TAG = MainActivity::class.java.simpleName
     private lateinit var binding: ActivityMainBinding
+
+    private var mInterstitialAd: InterstitialAd? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,10 +32,80 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_message, R.id.navigation_about
+                R.id.navigation_home, R.id.navigation_message, R.id.navigation_about_offline
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion())
+        // Initialize the Mobile Ads SDK.
+        MobileAds.initialize(this) {}
+
+        // Set your test devices. Check your logcat output for the hashed device ID to
+        // get test ads on a physical device. e.g.
+        // "Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("ABCDEF012345"))
+        // to get test ads on this device."
+        MobileAds.setRequestConfiguration(
+            RequestConfiguration.Builder().setTestDeviceIds(listOf("ABCDEF012345")).build()
+        )
+//
+//        MobileAds.initialize(this) {}
+//        /*
+        var adRequest = AdRequest.Builder().build()
+        Log.d(TAG, "XXXXX> onCreate: isTestDevice: ${adRequest.isTestDevice(this)}")
+
+        InterstitialAd.load(this,"ca-app-pub-3940256099942544/1033173712",
+            adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                adError.let { Log.d(TAG, it.toString()) }
+                mInterstitialAd = null
+            }
+
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                Log.d(TAG, "Ad was loaded.")
+                mInterstitialAd = interstitialAd
+            }
+        })
+
+//        /*
+        mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
+            override fun onAdClicked() {
+                // Called when a click is recorded for an ad.
+                Log.d(TAG, "Ad was clicked.")
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                // Called when ad is dismissed.
+                Log.d(TAG, "Ad dismissed fullscreen content.")
+                mInterstitialAd = null
+            }
+
+            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                // Called when ad fails to show.
+                Log.e(TAG, "Ad failed to show fullscreen content.")
+                mInterstitialAd = null
+            }
+
+            override fun onAdImpression() {
+                // Called when an impression is recorded for an ad.
+                Log.d(TAG, "Ad recorded an impression.")
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                // Called when ad is shown.
+                Log.d(TAG, "Ad showed fullscreen content.")
+            }
+        }
+
+//         */
+        binding.floatingActionButton.setOnClickListener {
+            if (mInterstitialAd != null) {
+                mInterstitialAd?.show(this)
+                Log.d(TAG, "XXXXX> fab click: show ad.\n mInterstitialAd = $mInterstitialAd ")
+            } else {
+                Log.d("TAG", "The interstitial ad wasn't ready yet.")
+            }
+        }
     }
 }
