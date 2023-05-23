@@ -12,14 +12,18 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker.PermissionResult
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mason.messagesync.model.Sms
 import com.mason.messagesync.databinding.FragmentMessageBinding
+import com.mason.messagesync.model.MessageViewModel
+import com.mason.messagesync.model.MessageViewModelFactory
 import com.mason.messagesync.model.SmsAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.security.Permission
@@ -32,18 +36,24 @@ class MessageFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private val smsList: MutableList<Sms> = mutableListOf()
+//    private val smsList: MutableList<Sms> = mutableListOf()
+
+    private val messageViewModel : MessageViewModel by viewModels {
+        MessageViewModelFactory(requireActivity().application)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val dashboardViewModel =
-            ViewModelProvider(this).get(MessageViewModel::class.java)
 
         _binding = FragmentMessageBinding.inflate(inflater, container, false)
-
+        binding.apply {
+            lifecycleOwner = viewLifecycleOwner
+            viewModel = messageViewModel
+        }
         return binding.root
     }
 
@@ -53,19 +63,29 @@ class MessageFragment : Fragment() {
         binding.recyclerViewMessage.adapter = smsAdapter
         binding.recyclerViewMessage.layoutManager = LinearLayoutManager(requireContext())
 
-        if (grantSmsPermission()) {
-            lifecycleScope.launch{
-                readAllSms()
-            }
+        checkPermissionAndLoadSMS()
+
+        messageViewModel.smsListLiveData.observe(viewLifecycleOwner) {
+            smsAdapter.submitList(it)
         }
 
+        binding.buttonReloadMessage.setOnClickListener {
+            checkPermissionAndLoadSMS()
+        }
+    }
 
+    private fun checkPermissionAndLoadSMS() {
+        takeIf { grantSmsPermission() }?.let {
+            messageViewModel.loadSMS()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+/*
 
 //    @RequiresPermission(Manifest.permission.READ_SMS)
     suspend fun readAllSms() {
@@ -91,10 +111,12 @@ class MessageFragment : Fragment() {
 
             withContext(Dispatchers.Main) {
                 smsAdapter.submitList(smsList)
+                binding.progressBarMessage.visibility = View.GONE
                 Log.d(Companion.TAG, "XXXXX> readAllSms: smsAdapter.itemCound = ${smsAdapter.itemCount}")
             }
         }
     }
+*/
 
     fun checkPermission(permission: String) = ActivityCompat.checkSelfPermission(
         requireActivity(),
