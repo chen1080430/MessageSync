@@ -6,7 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mason.messagesync.model.RetrofitManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.OkHttp
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import kotlin.math.log
 
 
 class HomeViewModel : ViewModel() {
@@ -37,6 +43,22 @@ class HomeViewModel : ViewModel() {
             Log.e(TAG, "XXXXX> sendMessage: e: ", e)
         }
     }
+
+    fun sendMessageByOkhttp3(message: String) = CoroutineScope(Dispatchers.IO).launch {
+        // make connection to telegram api by okhttp
+        val url =
+            "https://api.telegram.org/bot${RetrofitManager.INSTANCE.token}/sendMessage?chat_id=${RetrofitManager.INSTANCE.chatId}&text=$message"
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url(url)
+            .build()
+        var execute = client.newCall(request).execute()
+        Log.d(
+            TAG,
+            "XXXXX> sendMessageByOkhttp3: execute: $execute \nrequest: $request\n isSuccessful: ${execute.isSuccessful}"
+        )
+    }
+
 
     companion object {
         private const val TAG = "HomeViewModel"

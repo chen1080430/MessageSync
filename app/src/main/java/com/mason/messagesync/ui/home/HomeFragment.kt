@@ -37,7 +37,8 @@ class HomeFragment : Fragment() {
 
                 text.isNotEmpty().takeIf { it }?.let {
                     Log.d(Companion.TAG, "XXXXX> onCreateView: text: $text")
-                    homeViewModel.sendMessage(text.toString())
+//                    homeViewModel.sendMessage(text.toString())
+                    homeViewModel.sendMessageByOkhttp3(text.toString())
                 }
             }
         }
