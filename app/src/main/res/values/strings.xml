@@ -4,4 +4,5 @@
     <string name="title_message">Message</string>
     <string name="title_about">About</string>
     <string name="show_all_messages">Reload Messages</string>
+    <string name="home_telegram_description">Send message to Telegram</string>
 </resources>
