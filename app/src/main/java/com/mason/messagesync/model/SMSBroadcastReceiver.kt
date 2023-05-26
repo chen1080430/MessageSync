@@ -6,9 +6,11 @@ import android.content.Intent
 import android.provider.Telephony
 import android.telephony.SmsMessage
 import android.util.Log
-import androidx.annotation.RequiresPermission
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class SMSBroadcastReceiver: BroadcastReceiver() {
+class SMSBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.i(Companion.TAG, "XXXXX> onReceive: intent: ${intent.toString()}")
@@ -35,12 +37,40 @@ class SMSBroadcastReceiver: BroadcastReceiver() {
                                     ", displayOriginatingAddress: ${message.displayOriginatingAddress} " +
                                     ", timestampMillis = ${message.timestampMillis}"
                         )
+                        messageBody?.let {
+                            messageFrom?.let {
+                                sendSMSAsNotification(message)
+
+                            }
+                        }
+
                     }
                 }
 
-        }
+            }
 
     }
+
+    private fun sendSMSAsNotification(message: SmsMessage) =
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.d(Companion.TAG, "XXXXX> sendSMSAsNotification: messageBody = ${message.messageBody}, messageFrom = ${message.originatingAddress}")
+            var telegramDeafultApi = RetrofitManager.INSTANCE.telegramDeafultApi
+            try {
+
+
+                var sendMessage = telegramDeafultApi.sendMessage(
+                    RetrofitManager.INSTANCE.chatId,
+                    "新簡訊來囉!\nFrom:  ${message.originatingAddress}\nMessage: ${message.messageBody}"
+                )
+                Log.d(
+                    Companion.TAG,
+                    "XXXXX> sendSMSAsNotification: sendMessage.ok: ${sendMessage.ok}\n sendMessage.result = ${sendMessage.result}"
+                )
+            } catch (e: Throwable) {
+                Log.e(Companion.TAG, "XXXXX> sendSMSAsNotification: e: ", e)
+            }
+
+        }
 
     companion object {
         private const val TAG = "SMSBroadcastReceiver"

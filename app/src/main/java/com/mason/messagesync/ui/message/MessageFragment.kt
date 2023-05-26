@@ -1,9 +1,11 @@
 package com.mason.messagesync.ui.message
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -126,7 +128,7 @@ class MessageFragment : Fragment() {
     private fun grantSmsPermission(): Boolean {
         // check sms permission
         var checkReadSMSSelfPermission = checkPermission(Manifest.permission.READ_SMS)
-        var checkReceiveSMSSelfPermission = checkPermission(Manifest.permission.READ_SMS)
+        var checkReceiveSMSSelfPermission = checkPermission(Manifest.permission.RECEIVE_SMS)
         if (checkReadSMSSelfPermission != PackageManager.PERMISSION_GRANTED ||
             checkReceiveSMSSelfPermission != PackageManager.PERMISSION_GRANTED
         ) {

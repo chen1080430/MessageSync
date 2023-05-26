@@ -1,10 +1,16 @@
 package com.mason.messagesync
 
+import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -13,11 +19,13 @@ import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.mason.messagesync.databinding.ActivityMainBinding
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
     private val TAG = MainActivity::class.java.simpleName
     private lateinit var binding: ActivityMainBinding
     private val REQUEST_CODE_SMS_PERMISSION = 101
+    private val REQUEST_APP_SETTINGS = 102
 
     private var mInterstitialAd: InterstitialAd? = null
 
@@ -40,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-//        grantSmsPermission()
+        grantSmsPermission()
 
         Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion())
         // Initialize the Mobile Ads SDK.
@@ -114,30 +122,51 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun grantSmsPermission() : Boolean {
-        // check sms permission
         val smsPermission = android.Manifest.permission.RECEIVE_SMS
         val grant = checkCallingOrSelfPermission(smsPermission)
         if (grant != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            // request permission
             requestPermissions(arrayOf(smsPermission), REQUEST_CODE_SMS_PERMISSION)
         }
         return grant == android.content.pm.PackageManager.PERMISSION_GRANTED
-//        return true
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissions.forEach {
+            Log.d(TAG, "XXXXX> onRequestPermissionsResult: permissions: ${it}")
+        }
         when (requestCode) {
             REQUEST_CODE_SMS_PERMISSION -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // 權限已獲得，執行相應操作
                     Log.d(TAG, "XXXXX> onRequestPermissionsResult: permission granted.")
                 } else {
-                    // 權限被拒絕
                     Log.d(TAG, "XXXXX> onRequestPermissionsResult: permission denied.")
+                    Toast.makeText(this, "請開啟簡訊權限", Toast.LENGTH_LONG).show()
+//                    openAppSettings()
                 }
             }
             // ...
+        }
+    }
+
+    fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", this.packageName, null)
+        intent.data = uri
+        startActivityForResult(intent, REQUEST_APP_SETTINGS)
+    }
+
+    fun checkPermission(permission: String) = ActivityCompat.checkSelfPermission(
+        this,
+        permission
+    )
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_APP_SETTINGS) {
+            checkPermission(Manifest.permission.READ_SMS)
+            checkPermission(Manifest.permission.RECEIVE_SMS)
+            Log.i(TAG, "XXXXX> onActivityResult: REQUEST_APP_SETTINGS: ")
         }
     }
 }

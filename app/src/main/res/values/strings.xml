@@ -5,7 +5,7 @@
     <string name="title_about">About</string>
     <string name="show_all_messages">Reload Messages</string>
     <string name="home_telegram_description">Send message to Telegram</string>
-    <string name="edittext_plus1">Okhttp_0525_00%d</string>
+    <string name="edittext_plus1">Okhttp_0526_00%d</string>
     <string name="message_result">ResponseBody: \n%s </string>
     <string name="send_message">Send</string>
     <string name="check_token">Check Token</string>
