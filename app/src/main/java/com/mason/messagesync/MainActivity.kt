@@ -1,5 +1,6 @@
 package com.mason.messagesync
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -16,6 +17,7 @@ import com.mason.messagesync.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private val TAG = MainActivity::class.java.simpleName
     private lateinit var binding: ActivityMainBinding
+    private val REQUEST_CODE_SMS_PERMISSION = 101
 
     private var mInterstitialAd: InterstitialAd? = null
 
@@ -37,6 +39,8 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+//        grantSmsPermission()
 
         Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion())
         // Initialize the Mobile Ads SDK.
@@ -106,6 +110,34 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Log.d("TAG", "The interstitial ad wasn't ready yet.")
             }
+        }
+    }
+
+    private fun grantSmsPermission() : Boolean {
+        // check sms permission
+        val smsPermission = android.Manifest.permission.RECEIVE_SMS
+        val grant = checkCallingOrSelfPermission(smsPermission)
+        if (grant != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            // request permission
+            requestPermissions(arrayOf(smsPermission), REQUEST_CODE_SMS_PERMISSION)
+        }
+        return grant == android.content.pm.PackageManager.PERMISSION_GRANTED
+//        return true
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_CODE_SMS_PERMISSION -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 權限已獲得，執行相應操作
+                    Log.d(TAG, "XXXXX> onRequestPermissionsResult: permission granted.")
+                } else {
+                    // 權限被拒絕
+                    Log.d(TAG, "XXXXX> onRequestPermissionsResult: permission denied.")
+                }
+            }
+            // ...
         }
     }
 }

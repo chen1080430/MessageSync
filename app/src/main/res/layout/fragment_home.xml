@@ -38,6 +38,7 @@
             android:id="@+id/editText_send_telegram"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
             android:hint="Send to Telegram..."
             android:text="@{@string/edittext_plus1(viewModel.testCounter)}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -51,6 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/send_message"
+            android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/editText_send_telegram"
             app:layout_constraintHorizontal_bias="0.0"
@@ -95,7 +97,7 @@
                 android:id="@+id/radioButton_check_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="@dimen/activity_horizontal_margin"
                 android:text="@string/check_token"
                 android:textSize="16sp" />
 
@@ -103,7 +105,7 @@
                 android:id="@+id/radioButton_send_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="@dimen/activity_horizontal_margin"
                 android:text="@string/send_message"
                 android:textSize="16sp" />
         </RadioGroup>

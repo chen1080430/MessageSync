@@ -38,7 +38,7 @@ class MessageFragment : Fragment() {
     private val binding get() = _binding!!
 //    private val smsList: MutableList<Sms> = mutableListOf()
 
-    private val messageViewModel : MessageViewModel by viewModels {
+    private val messageViewModel: MessageViewModel by viewModels {
         MessageViewModelFactory(requireActivity().application)
     }
 
@@ -85,66 +85,70 @@ class MessageFragment : Fragment() {
         _binding = null
     }
 
-/*
+    /*
 
-//    @RequiresPermission(Manifest.permission.READ_SMS)
-    suspend fun readAllSms() {
-        val cursor = requireActivity().contentResolver.query(
-            Uri.parse("content://sms/"),
-            null,
-            null,
-            null,
-            null
-        )
-        cursor?.let {
-            smsList.removeAll(smsList)
-            while (it.moveToNext()) {
-                val id = it.getLong(it.getColumnIndexOrThrow("_id"))
-                val address = it.getString(it.getColumnIndexOrThrow("address")).toString()
-                val body = it.getString(it.getColumnIndexOrThrow("body")).toString()
-                val date = it.getString(it.getColumnIndexOrThrow("date")).toString()
-                val type = it.getInt(it.getColumnIndexOrThrow("type"))
-                val sms = Sms(id, address, body, date, type)
-                smsList.add(sms)
-            }
-            it.close()
+    //    @RequiresPermission(Manifest.permission.READ_SMS)
+        suspend fun readAllSms() {
+            val cursor = requireActivity().contentResolver.query(
+                Uri.parse("content://sms/"),
+                null,
+                null,
+                null,
+                null
+            )
+            cursor?.let {
+                smsList.removeAll(smsList)
+                while (it.moveToNext()) {
+                    val id = it.getLong(it.getColumnIndexOrThrow("_id"))
+                    val address = it.getString(it.getColumnIndexOrThrow("address")).toString()
+                    val body = it.getString(it.getColumnIndexOrThrow("body")).toString()
+                    val date = it.getString(it.getColumnIndexOrThrow("date")).toString()
+                    val type = it.getInt(it.getColumnIndexOrThrow("type"))
+                    val sms = Sms(id, address, body, date, type)
+                    smsList.add(sms)
+                }
+                it.close()
 
-            withContext(Dispatchers.Main) {
-                smsAdapter.submitList(smsList)
-                binding.progressBarMessage.visibility = View.GONE
-                Log.d(Companion.TAG, "XXXXX> readAllSms: smsAdapter.itemCound = ${smsAdapter.itemCount}")
+                withContext(Dispatchers.Main) {
+                    smsAdapter.submitList(smsList)
+                    binding.progressBarMessage.visibility = View.GONE
+                    Log.d(Companion.TAG, "XXXXX> readAllSms: smsAdapter.itemCound = ${smsAdapter.itemCount}")
+                }
             }
         }
-    }
-*/
+    */
 
     fun checkPermission(permission: String) = ActivityCompat.checkSelfPermission(
         requireActivity(),
         permission
     )
+
     private fun grantSmsPermission(): Boolean {
         // check sms permission
-                var checkSelfPermission = checkPermission(Manifest.permission.READ_SMS)
-                if (checkSelfPermission != PackageManager.PERMISSION_GRANTED) {
-                    // request permission
-                    ActivityCompat.requestPermissions(
-                        requireActivity(),
-                        arrayOf(Manifest.permission.READ_SMS),
-                        0
-                    )
-                }
+        var checkReadSMSSelfPermission = checkPermission(Manifest.permission.READ_SMS)
+        var checkReceiveSMSSelfPermission = checkPermission(Manifest.permission.READ_SMS)
+        if (checkReadSMSSelfPermission != PackageManager.PERMISSION_GRANTED ||
+            checkReceiveSMSSelfPermission != PackageManager.PERMISSION_GRANTED
+        ) {
+            // request permission
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS),
+                0
+            )
+        }
         return checkPermission(Manifest.permission.READ_SMS) == android.content.pm.PackageManager.PERMISSION_GRANTED
 
-/*
-        val smsPermission = android.Manifest.permission.READ_SMS
-        val grant = requireActivity().checkCallingOrSelfPermission(smsPermission)
-        if (grant != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            // request permission
-            requestPermissions(arrayOf(smsPermission), 0)
-        }
-        return grant == android.content.pm.PackageManager.PERMISSION_GRANTED
-//        return true
- */
+        /*
+                val smsPermission = android.Manifest.permission.READ_SMS
+                val grant = requireActivity().checkCallingOrSelfPermission(smsPermission)
+                if (grant != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    // request permission
+                    requestPermissions(arrayOf(smsPermission), 0)
+                }
+                return grant == android.content.pm.PackageManager.PERMISSION_GRANTED
+        //        return true
+         */
     }
 
     companion object {
