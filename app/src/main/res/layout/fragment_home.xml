@@ -23,51 +23,88 @@
             android:id="@+id/text_home"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginHorizontal="@dimen/view_horizontal_8dp"
+            android:layout_marginTop="@dimen/view_vertical_margin_8dp"
             android:text="@string/home_telegram_description"
             android:textAlignment="center"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/editText_send_telegram"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.01" />
+
+
+        <TextView
+            android:id="@+id/text_telegram_token"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/view_vertical_margin_8dp"
+            android:text="@string/telegram_token"
+            android:textSize="@dimen/textview_textsize"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/text_home" />
 
         <EditText
-            android:id="@+id/editText_send_telegram"
+            android:id="@+id/editText_telegram_token"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-            android:hint="Send to Telegram..."
-            android:text="@{@string/edittext_plus1(viewModel.testCounter)}"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="@dimen/view_vertical_margin_8dp"
+            android:hint="Please enter telegram token"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.2" />
+            app:layout_constraintTop_toBottomOf="@id/text_telegram_token" />
+
+        <TextView
+            android:id="@+id/text_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/view_vertical_margin_8dp"
+            android:text="@string/text_message"
+            android:textSize="@dimen/textview_textsize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_home" />
+
+        <EditText
+            android:id="@+id/editText_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/view_vertical_margin_8dp"
+            android:hint="Send to Telegram..."
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_message" />
+<!--        android:text="@{@string/edittext_plus1(viewModel.testCounter)}"-->
 
         <Button
             android:id="@+id/button_telegram_send"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/send_message"
             android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+            android:text="@string/send_message"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/editText_send_telegram"
+            app:layout_constraintEnd_toEndOf="@id/editText_message"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@id/editText_send_telegram"
-            app:layout_constraintTop_toTopOf="@id/editText_send_telegram"
+            app:layout_constraintStart_toStartOf="@id/editText_message"
+            app:layout_constraintTop_toTopOf="@id/editText_message"
             app:layout_constraintVertical_bias="0.2" />
-        <!--        android:onClick="@{()->homeFragment.updateTestCounter(viewModel.testCounter)}"-->
 
         <TextView
             android:id="@+id/message_result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="@dimen/view_horizontal_8dp"
+            android:layout_marginTop="@dimen/view_horizontal_8dp"
+            android:layout_marginEnd="@dimen/view_horizontal_8dp"
             android:text="@{@string/message_result(viewModel.responseBody)}"
             android:textAlignment="center"
             android:textSize="20sp"
@@ -87,11 +124,11 @@
             android:gravity="center"
             android:onCheckedChanged="@{(group, checkedId) -> homeFragment.onRadioButtonClicked(group, checkedId)}"
             android:orientation="horizontal"
-            android:paddingHorizontal="8dp"
+            android:paddingHorizontal="@dimen/view_vertical_margin_8dp"
             app:layout_constraintBottom_toTopOf="@+id/button_telegram_send"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editText_send_telegram">
+            app:layout_constraintTop_toBottomOf="@+id/editText_message">
 
             <RadioButton
                 android:id="@+id/radioButton_check_status"

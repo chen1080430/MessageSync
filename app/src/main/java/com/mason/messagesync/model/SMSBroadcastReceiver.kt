@@ -10,6 +10,7 @@ import android.telephony.SmsMessage
 import com.mason.messagesync.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -95,7 +96,8 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
         }
 
     private suspend fun getCompleteMessage(message: SmsMessage): Sms? {
-        loadLast5Messages().forEach { sms ->
+        loadLast5Messages()
+        smsList.forEach { sms ->
             message.originatingAddress.takeIf { address -> sms.address == address }
                 ?.let { address1 ->
                     message.messageBody.takeIf { body -> sms.body.contains(body) }?.let {
@@ -111,37 +113,40 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
         return null
     }
 
+    @OptIn(InternalCoroutinesApi::class)
     private suspend fun loadLast5Messages(): MutableList<Sms> {
-        smsList.clear()
-        val cursor: Cursor? = context?.contentResolver?.query(
-            Uri.parse("content://sms/inbox"),
-            null,
-            null,
-            null,
-            "date DESC"
-        )
+       kotlinx.coroutines.internal.synchronized(smsList) {
+           smsList.clear()
+           val cursor: Cursor? = context?.contentResolver?.query(
+               Uri.parse("content://sms/inbox"),
+               null,
+               null,
+               null,
+               "date DESC"
+           )
 
-        cursor?.use {
-            val count = it.count
-            val maxCount = if (count > 5) 5 else count
+           cursor?.use {
+               val count = it.count
+               val maxCount = if (count > 5) 5 else count
 
-            for (i in 0 until maxCount) {
-                if (it.moveToNext()) {
-                    val id = it.getLong(it.getColumnIndexOrThrow("_id"))
-                    val address = it.getString(it.getColumnIndexOrThrow("address")).toString()
-                    val body = it.getString(it.getColumnIndexOrThrow("body")).toString()
-                    val date = it.getString(it.getColumnIndexOrThrow("date")).toString()
-                    val type = it.getInt(it.getColumnIndexOrThrow("type"))
-                    val sms = Sms(id, address, body, date, type)
-                    smsList.add(sms)
-                }
-            }
-        }
-        LogUtil.d(
-            this::class.java.simpleName,
-            "loadLast5Messages: smsList = ${smsList.size}"
-        )
-        return smsList
+               for (i in 0 until maxCount) {
+                   if (it.moveToNext()) {
+                       val id = it.getLong(it.getColumnIndexOrThrow("_id"))
+                       val address = it.getString(it.getColumnIndexOrThrow("address")).toString()
+                       val body = it.getString(it.getColumnIndexOrThrow("body")).toString()
+                       val date = it.getString(it.getColumnIndexOrThrow("date")).toString()
+                       val type = it.getInt(it.getColumnIndexOrThrow("type"))
+                       val sms = Sms(id, address, body, date, type)
+                       smsList.add(sms)
+                   }
+               }
+           }
+           LogUtil.d(
+               this::class.java.simpleName,
+               "loadLast5Messages: smsList = ${smsList.size}"
+           )
+           return smsList
+       }
     }
 
     private fun timeFormat(rawDate: Long): String {

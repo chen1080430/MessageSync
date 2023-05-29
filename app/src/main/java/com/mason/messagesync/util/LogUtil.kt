@@ -2,8 +2,12 @@ package com.mason.messagesync.util
 
 import android.util.Log
 import com.mason.messagesync.BuildConfig
+import kotlin.math.log
 
 class LogUtil {
+    init {
+        Log.v("LogUtil", "XXXXX> : BuildConfig.DEBUG: ${BuildConfig.DEBUG} \nLOG_TYPE: $LOG_TYPE")
+    }
 
     companion object{
         private val LOGTAG = "${LogUtil::class.simpleName}: "

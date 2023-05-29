@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mason.messagesync.R
 import com.mason.messagesync.databinding.SmsItemBinding
-import com.mason.messagesync.util.LogUtil
 import java.text.SimpleDateFormat
+import java.util.Locale
 
 class SmsAdapter : ListAdapter<Sms, SmsViewHolder>(SmsComparator()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SmsViewHolder {
@@ -19,8 +19,8 @@ class SmsAdapter : ListAdapter<Sms, SmsViewHolder>(SmsComparator()) {
     }
 
     override fun onBindViewHolder(holder: SmsViewHolder, position: Int) {
-        var timeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(getItem(position).date.toLong())
-        LogUtil.d(this::class.java.simpleName, "onBindViewHolder: message: ${getItem(position).body}\ntime: ${getItem(position).date} -> formated: $timeFormat")
+        var timeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+            .format(getItem(position).date.toLong())
         holder.binding.textViewDateTime.text = timeFormat
         holder.binding.textViewMessageBody.text = getItem(position).body
         holder.binding.textViewPhoneNumber.text = getItem(position).address

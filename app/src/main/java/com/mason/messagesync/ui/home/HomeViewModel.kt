@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import com.mason.messagesync.model.RetrofitManager
+import com.mason.messagesync.model.TelegramApiClass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,7 +24,8 @@ import okio.Buffer
 
 class HomeViewModel : ViewModel() {
 
-    val telegramApi by lazy { RetrofitManager.INSTANCE.telegramDeafultApi }
+    val telegramApi : TelegramApiClass
+        get() = RetrofitManager.INSTANCE.telegramDeafultApi
 
     private val _responseBody = MutableLiveData<String>()
     val responseBody: LiveData<String> = _responseBody
@@ -82,9 +84,10 @@ class HomeViewModel : ViewModel() {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("message", message)
                 .build()
+            //Todo add LINE_NOTIFY_TOKEN_MASON_GROUP
             val request = Request.Builder()
                 .url(url)
-                .header("Authorization", RetrofitManager.INSTANCE.LINE_NOTIFY_TOKEN_MASON_GROUP)
+//                .header("Authorization", RetrofitManager.INSTANCE.LINE_NOTIFY_TOKEN_MASON_GROUP)
                 .post(requestBody)
                 .build()
 
@@ -100,6 +103,7 @@ class HomeViewModel : ViewModel() {
 
     fun checkToken() = viewModelScope.launch {
         try {
+            Log.e(TAG, "XXXXX> checkToken: token: ${RetrofitManager.INSTANCE.token} , chatId: ${RetrofitManager.INSTANCE.chatId}")
             var checkToken = telegramApi.checkToken()
             Log.d(
                 TAG,
@@ -122,6 +126,12 @@ class HomeViewModel : ViewModel() {
             } finally {
             }
         }
+    }
+
+    fun setTelegramTokenAndID(telegramToken: String, chatId: String) {
+//        RetrofitManager.INSTANCE.token = telegramToken
+//        RetrofitManager.INSTANCE.chatId = chatId.toLong()
+//        RetrofitManager.INSTANCE.recreateApi()
     }
 
 

@@ -13,7 +13,7 @@ interface TelegramApiClass {
     @FormUrlEncoded
     @POST("sendMessage")
     suspend fun sendMessage(
-        @Field("chat_id") id: Long, @Field("text") text: String
+        @Field("chat_id") id: String, @Field("text") text: String
     ): TelegramResponse
 
 

@@ -1,17 +1,14 @@
 package com.mason.messagesync.model
 
-import android.Manifest
 import android.app.Application
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.mason.messagesync.util.LogUtil
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -28,8 +25,6 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
     private val context = application
 
     private val _smsList: MutableLiveData<MutableList<Sms>> = MutableLiveData(mutableListOf())
-    // create livedata to expose the list
-//    private val _smsListLiveData: MutableLiveData<MutableList<Sms>> = MutableLiveData()
 
     val smsListLiveData: LiveData<MutableList<Sms>>
         get() = _smsList
@@ -63,7 +58,7 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
                     smslist.add(sms)
                 }
                 it.close()
-                Log.d(TAG, "XXXXX> readAllSms: smsAdapter.itemCound = ${smslist.size}")
+                LogUtil.d(TAG, "XXXXX> readAllSms: smsAdapter.itemCound = ${smslist.size}")
                 _smsList.postValue(smslist)
             }
         }
@@ -76,7 +71,7 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
                 _loading.value = true
                 block.invoke()
             } catch (e: Throwable) {
-                Log.d(Companion.TAG, "XXXXX> launchDataLoad: e: $e")
+                LogUtil.d(Companion.TAG, "XXXXX> launchDataLoad: e: $e")
             } finally {
                 _loading.value = false
             }
