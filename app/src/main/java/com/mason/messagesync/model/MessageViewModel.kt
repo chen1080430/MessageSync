@@ -46,7 +46,7 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
             null,
             null,
             null,
-            null
+            "date DESC"
         )
         cursor?.let {
             var smslist = _smsList.value

@@ -3,18 +3,27 @@ package com.mason.messagesync.model
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.provider.Telephony
 import android.telephony.SmsMessage
-import android.util.Log
+import com.mason.messagesync.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class SMSBroadcastReceiver : BroadcastReceiver() {
+    private var context: Context? = null
+    private var smsList = mutableListOf<Sms>()
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.i(Companion.TAG, "XXXXX> onReceive: intent: ${intent.toString()}")
-        //check if is sms action and print message body
+        LogUtil.i(
+            Companion.TAG,
+            "onReceive: intent: ${intent.toString()} , this: $this"
+        )
+        this.context = context
         intent?.takeIf { it -> it.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION }
             ?.apply {
                 val bundle = extras
@@ -30,12 +39,13 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                         }
                         val messageBody = message.messageBody
                         val messageFrom = message.originatingAddress
-                        Log.d(
-                            Companion.TAG,
-                            "XXXXX> onReceive: SMS: messageBody = $messageBody, messageFrom = $messageFrom" +
+                        LogUtil.d(
+                            this::class.java.simpleName,
+                            "onReceive: SMS: messageBody = $messageBody, messageFrom = $messageFrom" +
                                     "\n displayMessageBody: ${message.displayMessageBody}  " +
                                     ", displayOriginatingAddress: ${message.displayOriginatingAddress} " +
-                                    ", timestampMillis = ${message.timestampMillis}"
+                                    ", timestampMillis: ${timeFormat(message.timestampMillis)}"
+
                         )
                         messageBody?.let {
                             messageFrom?.let {
@@ -53,24 +63,92 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
 
     private fun sendSMSAsNotification(message: SmsMessage) =
         CoroutineScope(Dispatchers.IO).launch {
-            Log.d(Companion.TAG, "XXXXX> sendSMSAsNotification: messageBody = ${message.messageBody}, messageFrom = ${message.originatingAddress}")
-            var telegramDeafultApi = RetrofitManager.INSTANCE.telegramDeafultApi
-            try {
+            var completeSms = getCompleteMessage(message)
+            LogUtil.d(
+                this::class.java.simpleName,
+                "sendSMSAsNotification: completeSms: $completeSms"
+            )
 
 
-                var sendMessage = telegramDeafultApi.sendMessage(
-                    RetrofitManager.INSTANCE.chatId,
-                    "新簡訊來囉!\nFrom:  ${message.originatingAddress}\nMessage: ${message.messageBody}"
-                )
-                Log.d(
-                    Companion.TAG,
-                    "XXXXX> sendSMSAsNotification: sendMessage.ok: ${sendMessage.ok}\n sendMessage.result = ${sendMessage.result}"
-                )
-            } catch (e: Throwable) {
-                Log.e(Companion.TAG, "XXXXX> sendSMSAsNotification: e: ", e)
+            completeSms?.let { sms ->
+                var telegramDeafultApi = RetrofitManager.INSTANCE.telegramDeafultApi
+                try {
+                    var sendMessage = telegramDeafultApi.sendMessage(
+                        RetrofitManager.INSTANCE.chatId,
+                        "新簡訊來囉!\nFrom:  ${completeSms.address}" +
+                                "\nMessage: \n${sms.body}\nTime:   ${
+                                    timeFormat(
+                                        sms.date.toLong()
+                                    )
+                                }"
+                    )
+                    LogUtil.i(
+                        Companion.TAG,
+                        "sendSMSAsNotification: sendMessage.ok: ${sendMessage.ok}" +
+                                "\n sendMessage.result = ${sendMessage.result}"
+                    )
+                } catch (e: Throwable) {
+                    LogUtil.e(Companion.TAG, "sendSMSAsNotification: e: $e")
+                }
             }
 
         }
+
+    private suspend fun getCompleteMessage(message: SmsMessage): Sms? {
+        loadLast5Messages().forEach { sms ->
+            message.originatingAddress.takeIf { address -> sms.address == address }
+                ?.let { address1 ->
+                    message.messageBody.takeIf { body -> sms.body.contains(body) }?.let {
+                        LogUtil.d(
+                            this::class.java.simpleName,
+                            "getCompleteMessage: body same! return this sms"
+                        )
+                        return sms
+                    }
+                }
+        }
+        LogUtil.e(this::class.java.simpleName, "getCompleteMessage: no match sms found")
+        return null
+    }
+
+    private suspend fun loadLast5Messages(): MutableList<Sms> {
+        smsList.clear()
+        val cursor: Cursor? = context?.contentResolver?.query(
+            Uri.parse("content://sms/inbox"),
+            null,
+            null,
+            null,
+            "date DESC"
+        )
+
+        cursor?.use {
+            val count = it.count
+            val maxCount = if (count > 5) 5 else count
+
+            for (i in 0 until maxCount) {
+                if (it.moveToNext()) {
+                    val id = it.getLong(it.getColumnIndexOrThrow("_id"))
+                    val address = it.getString(it.getColumnIndexOrThrow("address")).toString()
+                    val body = it.getString(it.getColumnIndexOrThrow("body")).toString()
+                    val date = it.getString(it.getColumnIndexOrThrow("date")).toString()
+                    val type = it.getInt(it.getColumnIndexOrThrow("type"))
+                    val sms = Sms(id, address, body, date, type)
+                    smsList.add(sms)
+                }
+            }
+        }
+        LogUtil.d(
+            this::class.java.simpleName,
+            "loadLast5Messages: smsList = ${smsList.size}"
+        )
+        return smsList
+    }
+
+    private fun timeFormat(rawDate: Long): String {
+        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).apply {
+            return format(rawDate)
+        }
+    }
 
     companion object {
         private const val TAG = "SMSBroadcastReceiver"
