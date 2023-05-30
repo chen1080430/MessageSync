@@ -12,7 +12,7 @@ android {
         applicationId "com.mason.messagesync"
         minSdk 30
         targetSdk 33
-        versionCode 1001
+        versionCode 1011
         versionName "m1.01"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

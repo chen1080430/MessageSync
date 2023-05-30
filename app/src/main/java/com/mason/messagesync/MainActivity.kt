@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        grantSmsPermission()
+//        grantSmsPermission()
 
         PreferenceManager.getDefaultSharedPreferences(this).apply {
             this.getString(getString(R.string.telegram_chat_id_key), "0")

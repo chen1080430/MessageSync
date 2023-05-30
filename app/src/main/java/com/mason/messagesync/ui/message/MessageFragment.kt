@@ -126,7 +126,8 @@ class MessageFragment : Fragment() {
     )
 
     private fun grantSmsPermission(): Boolean {
-        // check sms permission
+        return false
+        // Todo: Need to fulfill google privacy policy
         var checkReadSMSSelfPermission = checkPermission(Manifest.permission.READ_SMS)
         var checkReceiveSMSSelfPermission = checkPermission(Manifest.permission.RECEIVE_SMS)
         if (checkReadSMSSelfPermission != PackageManager.PERMISSION_GRANTED ||
