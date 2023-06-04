@@ -14,10 +14,12 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker.PermissionResult
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mason.messagesync.BuildConfig
 import com.mason.messagesync.model.Sms
 import com.mason.messagesync.databinding.FragmentMessageBinding
 import com.mason.messagesync.model.MessageViewModel
@@ -40,7 +42,11 @@ class MessageFragment : Fragment() {
     private val binding get() = _binding!!
 //    private val smsList: MutableList<Sms> = mutableListOf()
 
-    private val messageViewModel: MessageViewModel by viewModels {
+//    private val messageViewModel: MessageViewModel by viewModels {
+//        MessageViewModelFactory(requireActivity().application)
+//    }
+
+    private val messageViewModel by activityViewModels<MessageViewModel> {
         MessageViewModelFactory(requireActivity().application)
     }
 
@@ -126,8 +132,8 @@ class MessageFragment : Fragment() {
     )
 
     private fun grantSmsPermission(): Boolean {
-        return false
-        // Todo: Need to fulfill google privacy policy
+        if (BuildConfig.DEBUG) return false
+//         TODO Release: check google privacy policy
         var checkReadSMSSelfPermission = checkPermission(Manifest.permission.READ_SMS)
         var checkReceiveSMSSelfPermission = checkPermission(Manifest.permission.RECEIVE_SMS)
         if (checkReadSMSSelfPermission != PackageManager.PERMISSION_GRANTED ||

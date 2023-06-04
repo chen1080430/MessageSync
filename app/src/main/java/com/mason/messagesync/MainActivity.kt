@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
-//        grantSmsPermission()
+        grantSmsPermission()
 
         PreferenceManager.getDefaultSharedPreferences(this).apply {
             this.getString(getString(R.string.telegram_chat_id_key), "0")
@@ -142,6 +142,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun grantSmsPermission(): Boolean {
+        if (BuildConfig.DEBUG) return false
+        // TODO Release: check google privacy policy
         val smsPermission = android.Manifest.permission.RECEIVE_SMS
         val grant = checkCallingOrSelfPermission(smsPermission)
         if (grant != android.content.pm.PackageManager.PERMISSION_GRANTED) {
