@@ -12,7 +12,7 @@ android {
         applicationId "com.mason.messagesync"
         minSdk 30
         targetSdk 33
-        versionCode 1811
+        versionCode 1812
         versionName "m1.01_readSMS"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -65,5 +65,7 @@ dependencies {
 //    implementation 'com.jakewharton.retrofit:retrofit2-kotlin-coroutines-experimental-adapter:1.0.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
 
 }
